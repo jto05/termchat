@@ -3,29 +3,20 @@ package main
 import "sync"
 
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Username string `json:"username"`
+	Content  string `json:"content"`
 }
 
-type MessageStore struct {
-	mu       sync.RWMutex
-	messages []Message
+type Hub struct {
+	mu sync.RWMutex
 }
 
-func NewMessageStore() *MessageStore {
-	return &MessageStore{}
+func NewHub() *Hub {
+	return &Hub{}
 }
 
-func (s *MessageStore) Add(msg Message) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.messages = append(s.messages, msg)
+func (h *Hub) Run() {
 }
 
-func (s *MessageStore) All() []Message {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	out := make([]Message, len(s.messages))
-	copy(out, s.messages)
-	return out
+func (h *Hub) Broadcast(msg Message) {
 }

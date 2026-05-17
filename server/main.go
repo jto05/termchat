@@ -6,9 +6,10 @@ import (
 )
 
 func main() {
-	store := NewMessageStore()
+	hub := NewHub()
+	go hub.Run()
 	mux := http.NewServeMux()
-	RegisterRoutes(mux, store)
+	RegisterRoutes(mux, hub)
 
 	log.Println("server listening on :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
