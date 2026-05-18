@@ -22,7 +22,7 @@ dev:
 	tmux split-window -v -t $(SESSION) && \
 	tmux send-keys -t $(SESSION) 'go run ./client' Enter && \
 	tmux select-pane -t $(SESSION):0.1 && \
-	tmux attach-session -t $(SESSION)
+	if [ -n "$$TMUX" ]; then tmux switch-client -t $(SESSION); else tmux attach-session -t $(SESSION); fi
 
 clean:
 	rm -rf $(BIN)
