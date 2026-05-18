@@ -26,9 +26,11 @@ parallel writes.
 func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 	// at websocket endpoint
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		// upgrade HTTP connection
 		conn, err := upgrader.Upgrade(w, r, nil) // no header for now
 		if err != nil {
 			log.Printf("error: %v", err)
+			return
 		}
 		defer conn.Close()
 
@@ -55,6 +57,7 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 			err := conn.ReadJSON(&msg)
 			if err != nil {
 				log.Printf("error: %v", err)
+				return
 			}
 			hub.Broadcast(msg)
 		}
