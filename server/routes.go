@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -54,10 +55,21 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 		// listen through client connection and broadcast any messages read
 		for {
 			var msg Message
-			err := conn.ReadJSON(&msg)
+			_, raw, err := conn.ReadMessage()
 			if err != nil {
 				log.Printf("error: %v", err)
 				return
+			}
+
+			err = json.Unmarshal(raw, &msg)
+			if err != nil {
+				log.Printf("error: %v", err)
+				return
+			}
+
+			if msg.Username == nil || msg.Content == nil {
+				log.Printf("invalid format")
+				continue
 			}
 			hub.Broadcast(msg)
 		}
