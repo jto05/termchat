@@ -6,6 +6,8 @@ A pub-sub router that broadcasts messaeges between subscribers
 
 package main
 
+import "log"
+
 /*
 Message
 A message contains its contents and an associated Username
@@ -61,6 +63,7 @@ func (h *Hub) Run() {
 
 		// broadcast messages to all clients
 		case msg := <-h.broadcast:
+			log.Printf("[%s]: %s", msg.Username, msg.Content)
 			for client := range h.clients {
 				client <- msg
 			}
