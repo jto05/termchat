@@ -24,5 +24,8 @@ dev:
 	tmux select-pane -t $(SESSION):0.1 && \
 	TMUX='' tmux attach-session -t $(SESSION)
 
+stop-dev:
+	tmux kill-session -t $(SESSION) 2>/dev/null; 
+
 clean:
 	rm -rf $(BIN)
