@@ -13,8 +13,8 @@ Message
 A message contains its contents and an associated Username
 */
 type Message struct {
-	Username string `json:"username"`
-	Content  string `json:"content"`
+	Username *string `json:"username"`
+	Content  *string `json:"content"`
 }
 
 /*
@@ -63,7 +63,7 @@ func (h *Hub) Run() {
 
 		// broadcast messages to all clients
 		case msg := <-h.broadcast:
-			log.Printf("[%s]: %s", msg.Username, msg.Content)
+			log.Printf("[%s]: %s", *msg.Username, *msg.Content)
 			for client := range h.clients {
 				client <- msg
 			}
