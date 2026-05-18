@@ -1,6 +1,6 @@
 .PHONY: build build-server build-client dev clean
 
-SESSION := termchat
+SESSION := termchat-dev
 BIN     := bin
 
 build: build-server build-client
@@ -22,7 +22,7 @@ dev:
 	tmux split-window -v -t $(SESSION) && \
 	tmux send-keys -t $(SESSION) 'go run ./client' Enter && \
 	tmux select-pane -t $(SESSION):0.1 && \
-	if [ -n "$$TMUX" ]; then tmux switch-client -t $(SESSION); else tmux attach-session -t $(SESSION); fi
+	TMUX='' tmux attach-session -t $(SESSION)
 
 clean:
 	rm -rf $(BIN)
