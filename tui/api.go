@@ -1,17 +1,16 @@
-package main
+package tui
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"termchat/internal/hub"
 
-const serverURL = "http://localhost:8080"
+	tea "github.com/charmbracelet/bubbletea"
+)
 
-type Message struct {
-	Username string `json:"username"`
-	Content  string `json:"content"`
-}
+const serverURL = "ws://localhost:8080/ws"
 
 type (
-	msgReceived Message
-	msgHistory  []Message
+	msgReceived hub.Message
+	msgHistory  []hub.Message
 	msgErr      struct{ err error }
 )
 

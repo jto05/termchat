@@ -5,6 +5,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"termchat/tui"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 	}
 	username := os.Args[1]
 
-	p := tea.NewProgram(NewApp(username), tea.WithAltScreen())
+	p := tea.NewProgram(tui.NewApp(username), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)

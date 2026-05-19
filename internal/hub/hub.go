@@ -1,10 +1,10 @@
 /*
-server/chat.go
+internal/hub/hub.go
 
 A pub-sub router that broadcasts messaeges between subscribers
 */
 
-package main
+package hub
 
 import "log"
 

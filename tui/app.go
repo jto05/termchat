@@ -1,6 +1,8 @@
-package main
+package tui
 
 import (
+	"termchat/internal/hub"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -8,7 +10,7 @@ import (
 
 type App struct {
 	username string
-	messages []Message
+	messages []hub.Message
 	input    textinput.Model
 	viewport viewport.Model
 	width    int
