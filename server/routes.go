@@ -56,17 +56,20 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 		for {
 			var msg Message
 			_, raw, err := conn.ReadMessage()
+			// check error in connection
 			if err != nil {
 				log.Printf("error: %v", err)
 				return
 			}
 
+			// check error in json
 			err = json.Unmarshal(raw, &msg)
 			if err != nil {
 				log.Printf("error: %v", err)
 				return
 			}
 
+			// check error in message format
 			if msg.Username == nil || msg.Content == nil {
 				log.Printf("invalid format")
 				continue
