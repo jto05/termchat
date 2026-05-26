@@ -16,5 +16,8 @@ func (a App) buildHistory() string {
 }
 
 func (a App) View() string {
-	return ""
+	if a.conn == nil {
+		return "connecting..."
+	}
+	return "connected as " + a.username
 }

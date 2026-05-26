@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gorilla/websocket"
 )
 
 type App struct {
@@ -16,11 +17,14 @@ type App struct {
 	width    int
 	height   int
 	err      error
+	conn     *websocket.Conn
 }
 
 func NewApp(username string) App {
 	ti := textinput.New()
 	ti.Placeholder = "Message..."
+
+	// go into focus state
 	ti.Focus()
 	ti.CharLimit = 0
 
@@ -32,9 +36,14 @@ func NewApp(username string) App {
 }
 
 func (a App) Init() tea.Cmd {
-	return nil
+	return connect(a.username)
 }
 
 func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch m := msg.(type) {
+	// set App's websocket connection when connected to
+	case msgConnected:
+		a.conn = (*websocket.Conn)(m)
+	}
 	return a, nil
 }

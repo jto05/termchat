@@ -4,19 +4,26 @@ import (
 	"termchat/internal/hub"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gorilla/websocket"
 )
 
+// TODO: add a config option to replace all dis?
 const serverURL = "ws://localhost:8080/ws"
 
 type (
-	msgReceived hub.Message
-	msgHistory  []hub.Message
-	msgErr      struct{ err error }
+	msgConnected *websocket.Conn
+	msgReceived  hub.Message
+	msgHistory   []hub.Message
+	msgErr       struct{ err error }
 )
 
 func connect(username string) tea.Cmd {
 	return func() tea.Msg {
-		return nil
+		conn, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
+		if err != nil {
+			return msgErr{err}
+		}
+		return msgConnected(conn)
 	}
 }
 
