@@ -1,4 +1,4 @@
-.PHONY: build build-server build-client dev clean
+.PHONY: build build-server build-client run-server run-client dev clean
 
 SESSION := termchat-dev
 BIN     := bin
@@ -12,6 +12,12 @@ build-server:
 build-client:
 	@mkdir -p $(BIN)
 	go build -o $(BIN)/client ./cmd/client
+
+run-server: build-server
+	$(BIN)/server
+
+run-client: build-client
+	$(BIN)/client $(USERNAME)
 
 dev:
 	tmux kill-session -t $(SESSION) 2>/dev/null; \
