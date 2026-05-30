@@ -19,7 +19,10 @@ type (
 
 func connect(username string) tea.Cmd {
 	return func() tea.Msg {
-		conn, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
+		conn, _, err := websocket.DefaultDialer.Dial(
+			serverURL+"?username="+username, // add username with initial query
+			nil,
+		)
 		if err != nil {
 			return msgErr{err}
 		}

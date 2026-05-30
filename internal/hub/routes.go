@@ -28,6 +28,15 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 	// at websocket endpoint
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		// upgrade HTTP connection
+
+		// get usenrame from query
+		username := r.URL.Query().Get("username")
+		if username == "" {
+			// throw error if no username provided
+			http.Error(w, "username required", http.StatusBadRequest)
+			return
+		}
+
 		conn, err := upgrader.Upgrade(w, r, nil) // no header for now
 		if err != nil {
 			log.Printf("error: %v", err)
@@ -69,11 +78,12 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 				return
 			}
 
-			// check error in message format
-			if msg.Username == nil || msg.Content == nil {
+			if msg.Content == nil {
+				// check error in message format
 				log.Printf("invalid format")
 				continue
 			}
+			msg.Username = &username
 			hub.Broadcast(msg)
 		}
 	})
