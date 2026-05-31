@@ -36,14 +36,38 @@ func NewApp(username string) App {
 }
 
 func (a App) Init() tea.Cmd {
-	return connect(a.username)
+	return tea.Batch(connect(a.username), textinput.Blink)
 }
 
 func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	a.input, cmd = a.input.Update(msg)
+
 	switch m := msg.(type) {
 	// set App's websocket connection when connected to
 	case msgConnected:
 		a.conn = (*websocket.Conn)(m)
+
+	// handle input textbox rendering
+	case tea.WindowSizeMsg:
+		a.width = m.Width
+		a.height = m.Height
+		a.viewport.Width = m.Width
+		a.viewport.Height = m.Height - inputHeight
+		a.input.Width = m.Width - 4
+
+	// handle key inputs
+	case tea.KeyMsg:
+		switch m.Type {
+		case tea.KeyEnter:
+			_ = a.input.Value()
+			a.input.Reset()
+
+		case tea.KeyCtrlC, tea.KeyEsc:
+			return a, tea.Quit
+		}
+
 	}
-	return a, nil
+
+	return a, cmd
 }
