@@ -22,9 +22,13 @@ func (a *App) renderViewport() {
 func (a App) buildHistory() string {
 	var sb strings.Builder
 	for _, msg := range a.messages {
+		wrapped := lipgloss.NewStyle().
+			Width(a.viewport.Width).
+			Render(*msg.Content)
+
 		sb.WriteString(
 			nameStyle.Render(*msg.Username) + ": " +
-				*msg.Content + "\n",
+				wrapped + "\n",
 		)
 	}
 	return sb.String()
