@@ -1,6 +1,9 @@
 package tui
 
 import (
+	"encoding/json"
+	"net/http"
+
 	"termchat/internal/hub"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -42,8 +45,30 @@ func sendMessage(conn *websocket.Conn, content string) tea.Cmd {
 	}
 }
 
+func listenForMessages(conn *websocket.Conn) tea.Cmd {
+	return func() tea.Msg {
+		var msg hub.Message
+		err := conn.ReadJSON(&msg)
+		if err != nil {
+			return msgErr{err}
+		}
+		return msgReceived(msg)
+	}
+}
+
 func fetchHistory() tea.Cmd {
 	return func() tea.Msg {
-		return nil
+		// TODO: fix server url
+		resp, err := http.Get("http://localhost:8080/history")
+		if err != nil {
+			return msgErr{err}
+		}
+
+		var msgs []hub.Message
+		err = json.NewDecoder(resp.Body).Decode(&msgs)
+		if err != nil {
+			return msgErr{err}
+		}
+		return msgHistory(msgs)
 	}
 }
