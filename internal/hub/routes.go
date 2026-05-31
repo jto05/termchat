@@ -37,6 +37,9 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 			return
 		}
 
+		log.Printf("%s connected", username)
+		defer log.Printf("%s disconnected", username)
+
 		conn, err := upgrader.Upgrade(w, r, nil) // no header for now
 		if err != nil {
 			log.Printf("error: %v", err)
@@ -87,4 +90,11 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 			hub.Broadcast(msg)
 		}
 	})
+
+	// history endpoint
+	mux.HandleFunc("GET /history",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(hub.Messages())
+		})
 }
