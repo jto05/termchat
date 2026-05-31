@@ -27,8 +27,6 @@ parallel writes.
 func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 	// at websocket endpoint
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		// upgrade HTTP connection
-
 		// get usenrame from query
 		username := r.URL.Query().Get("username")
 		if username == "" {
@@ -50,6 +48,9 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 		// register/unregister client
 		client := make(chan Message, 256)
 		hub.register <- client
+		for _, msg := range hub.Messages() {
+			client <- msg
+		}
 		// unregister if connection ends
 		defer func() { hub.unregister <- client }()
 
