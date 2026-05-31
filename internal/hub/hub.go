@@ -6,7 +6,10 @@ A pub-sub router that broadcasts messaeges between subscribers
 
 package hub
 
-import "log"
+import (
+	"log"
+	"sync"
+)
 
 /*
 Message
@@ -29,6 +32,8 @@ type Hub struct {
 	register   chan chan Message
 	unregister chan chan Message
 	broadcast  chan Message
+	messages   []Message
+	mu         sync.RWMutex
 }
 
 /*
@@ -63,12 +68,24 @@ func (h *Hub) Run() {
 
 		// broadcast messages to all clients
 		case msg := <-h.broadcast:
+			h.mu.Lock()
+			h.messages = append(h.messages, msg)
+			h.mu.Unlock()
+
 			log.Printf("[%s]: %s", *msg.Username, *msg.Content)
 			for client := range h.clients {
 				client <- msg
 			}
 		}
 	}
+}
+
+func (h *Hub) Messages() []Message {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	out := make([]Message, len(h.messages))
+	copy(out, h.messages)
+	return out
 }
 
 /*
