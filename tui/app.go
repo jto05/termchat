@@ -36,7 +36,11 @@ func NewApp(username string) App {
 }
 
 func (a App) Init() tea.Cmd {
-	return tea.Batch(connect(a.username), textinput.Blink)
+	return tea.Batch(
+		connect(a.username),
+		fetchHistory(),
+		textinput.Blink,
+	)
 }
 
 func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -52,6 +56,13 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// set App's websocket connection when connected to
 	case msgConnected:
 		a.conn = (*websocket.Conn)(m)
+		return a, listenForMessages(a.conn)
+
+	// handle chat history
+	case msgHistory:
+		a.messages = []hub.Message(m)
+		a.viewport.SetContent(a.buildHistory())
+		a.viewport.GotoBottom()
 
 	// handle input textbox rendering
 	case tea.WindowSizeMsg:
@@ -61,6 +72,12 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.viewport.Height = m.Height - inputHeight
 		a.input.Width = m.Width - 4
 
+	case msgReceived:
+		a.messages = append(a.messages, hub.Message(m))
+		a.viewport.SetContent(a.buildHistory())
+		a.viewport.GotoBottom()
+		return a, listenForMessages(a.conn)
+
 	// handle key inputs
 	case tea.KeyMsg:
 		switch m.Type {
@@ -69,7 +86,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.input.Reset()
 			return a, sendMessage(a.conn, content)
 
-		case tea.KeyCtrlC, tea.KeyEsc: //
+		case tea.KeyCtrlC: //
 			return a, tea.Quit
 		}
 	}
