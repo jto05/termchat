@@ -44,6 +44,11 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	a.input, cmd = a.input.Update(msg)
 
 	switch m := msg.(type) {
+
+	// set message errors
+	case msgErr:
+		a.err = m.err
+
 	// set App's websocket connection when connected to
 	case msgConnected:
 		a.conn = (*websocket.Conn)(m)
@@ -59,14 +64,14 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// handle key inputs
 	case tea.KeyMsg:
 		switch m.Type {
-		case tea.KeyEnter:
-			_ = a.input.Value()
+		case tea.KeyEnter: // send message here
+			content := a.input.Value()
 			a.input.Reset()
+			return a, sendMessage(a.conn, content)
 
-		case tea.KeyCtrlC, tea.KeyEsc:
+		case tea.KeyCtrlC, tea.KeyEsc: //
 			return a, tea.Quit
 		}
-
 	}
 
 	return a, cmd

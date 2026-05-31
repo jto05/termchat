@@ -32,6 +32,12 @@ func connect(username string) tea.Cmd {
 
 func sendMessage(conn *websocket.Conn, content string) tea.Cmd {
 	return func() tea.Msg {
+		err := conn.WriteJSON(
+			map[string]string{"content": content},
+		)
+		if err != nil {
+			return msgErr{err}
+		}
 		return nil
 	}
 }
