@@ -30,7 +30,7 @@ func connect(username string) tea.Cmd {
 	}
 }
 
-func sendMessage(username, content string) tea.Cmd {
+func sendMessage(conn *websocket.Conn, content string) tea.Cmd {
 	return func() tea.Msg {
 		return nil
 	}
