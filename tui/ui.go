@@ -1,6 +1,10 @@
 package tui
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+)
 
 var (
 	nameStyle     = lipgloss.NewStyle().Bold(true)
@@ -11,10 +15,19 @@ var (
 const inputHeight = 3
 
 func (a *App) renderViewport() {
+	a.viewport.SetContent(a.buildHistory())
+	a.viewport.GotoBottom()
 }
 
 func (a App) buildHistory() string {
-	return ""
+	var sb strings.Builder
+	for _, msg := range a.messages {
+		sb.WriteString(
+			nameStyle.Render(*msg.Username) + ": " +
+				*msg.Content + "\n",
+		)
+	}
+	return sb.String()
 }
 
 func (a App) renderInput() string {
@@ -22,13 +35,12 @@ func (a App) renderInput() string {
 }
 
 func (a App) View() string {
-	inputLine := inputBoxStyle.
-		Width(a.width - 2).
-		Render(a.input.View())
-
+	if a.width == 0 {
+		return "loading..."
+	}
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.viewport.View(),
-		inputLine,
+		a.renderInput(),
 	)
 }
