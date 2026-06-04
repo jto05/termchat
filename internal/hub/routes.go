@@ -112,7 +112,7 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 		}
 	})
 
-	// history endpoint
+	// at history endpoint call and return hub.Messages()
 	mux.HandleFunc("GET /history",
 		func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")

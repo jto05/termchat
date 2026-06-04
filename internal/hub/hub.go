@@ -80,7 +80,12 @@ func (h *Hub) Run() {
 	}
 }
 
+/*
+Messages()
+Returns a slice of the total messages sent ithrough the hub
+*/
 func (h *Hub) Messages() []Message {
+	// mutex required
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	out := make([]Message, len(h.messages))
