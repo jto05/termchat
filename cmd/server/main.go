@@ -1,3 +1,5 @@
+// cmd/server/main.go -- entry point for the chat server.
+// Starts the hub and listens for WebSocket connections on :8080.
 package main
 
 import (

@@ -1,3 +1,5 @@
+// cmd/client/main.go -- entry point for the chat client.
+// Takes a username and server address as arguments.
 package main
 
 import (
