@@ -2,6 +2,7 @@ package hub
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -35,9 +36,6 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 			return
 		}
 
-		log.Printf("%s connected", username)
-		defer log.Printf("%s disconnected", username)
-
 		conn, err := upgrader.Upgrade(w, r, nil) // no header for now
 		if err != nil {
 			log.Printf("error: %v", err)
@@ -53,6 +51,28 @@ func RegisterRoutes(mux *http.ServeMux, hub *Hub) {
 		}
 		// unregister if connection ends
 		defer func() { hub.unregister <- client }()
+
+		// logging and broadcasting join messages
+		joinMsg := fmt.Sprintf("%s joins the chat", username)
+		leaveMsg := fmt.Sprintf("%s leaves the chat", username)
+		serverName := "Server"
+		log.Println(joinMsg)
+
+		hub.Broadcast(
+			Message{
+				Username: &serverName,
+				Content:  &joinMsg,
+			},
+		)
+
+		defer hub.Broadcast(
+			Message{
+				Username: &serverName,
+				Content:  &leaveMsg,
+			},
+		)
+
+		defer log.Println(leaveMsg)
 
 		// write to client any messages that are in its channel
 		go func() {
