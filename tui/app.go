@@ -17,11 +17,11 @@ type App struct {
 	width     int
 	height    int
 	err       error
-	serverURL string
+	serverAddr string
 	conn      *websocket.Conn
 }
 
-func NewApp(username string, serverURL string) App {
+func NewApp(username string, serverAddr string) App {
 	ti := textinput.New()
 	ti.Placeholder = "Message..."
 
@@ -30,16 +30,17 @@ func NewApp(username string, serverURL string) App {
 	ti.CharLimit = 0
 
 	return App{
-		username: username,
-		input:    ti,
-		viewport: viewport.New(0, 0),
+		username:  username,
+		serverAddr: serverAddr,
+		input:     ti,
+		viewport:  viewport.New(0, 0),
 	}
 }
 
 func (a App) Init() tea.Cmd {
 	return tea.Batch(
-		connect(a.username),
-		fetchHistory(),
+		connect(a.serverAddr, a.username),
+		fetchHistory(a.serverAddr),
 		textinput.Blink,
 	)
 }

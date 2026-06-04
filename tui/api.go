@@ -10,9 +10,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// TODO: add a config option to replace all dis?
-const serverURL = "ws://localhost:8080/ws"
-
 type (
 	msgConnected *websocket.Conn
 	msgReceived  hub.Message
@@ -20,10 +17,10 @@ type (
 	msgErr       struct{ err error }
 )
 
-func connect(username string) tea.Cmd {
+func connect(serverAddr string, username string) tea.Cmd {
 	return func() tea.Msg {
 		conn, _, err := websocket.DefaultDialer.Dial(
-			serverURL+"?username="+username, // add username with initial query
+			"ws://"+serverAddr+"/ws?username="+username, // add username with initial query
 			nil,
 		)
 		if err != nil {
@@ -56,10 +53,9 @@ func listenForMessages(conn *websocket.Conn) tea.Cmd {
 	}
 }
 
-func fetchHistory() tea.Cmd {
+func fetchHistory(serverAddr string) tea.Cmd {
 	return func() tea.Msg {
-		// TODO: fix server url
-		resp, err := http.Get("http://localhost:8080/history")
+		resp, err := http.Get("http://" + serverAddr + "/history")
 		if err != nil {
 			return msgErr{err}
 		}
