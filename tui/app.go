@@ -10,17 +10,18 @@ import (
 )
 
 type App struct {
-	username string
-	messages []hub.Message
-	input    textinput.Model
-	viewport viewport.Model
-	width    int
-	height   int
-	err      error
-	conn     *websocket.Conn
+	username  string
+	messages  []hub.Message
+	input     textinput.Model
+	viewport  viewport.Model
+	width     int
+	height    int
+	err       error
+	serverURL string
+	conn      *websocket.Conn
 }
 
-func NewApp(username string) App {
+func NewApp(username string, serverURL string) App {
 	ti := textinput.New()
 	ti.Placeholder = "Message..."
 
@@ -69,7 +70,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.width = m.Width
 		a.height = m.Height
 		a.viewport.Width = m.Width
-		a.viewport.Height = m.Height - inputHeight
+		a.viewport.Height = m.Height - 3
 		a.input.Width = m.Width - 4
 
 	case msgReceived:
