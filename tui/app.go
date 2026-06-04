@@ -1,3 +1,10 @@
+/*
+tui/app.go
+
+Defines the bubbletea App model and implements the Elm architecture --
+Init, Update, and View -- for the chat client.
+*/
+
 package tui
 
 import (
@@ -9,18 +16,27 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+/*
+App
+The bubbletea model. Holds all client state including the WebSocket
+connection, message history, input box, and terminal dimensions.
+*/
 type App struct {
-	username  string
-	messages  []hub.Message
-	input     textinput.Model
-	viewport  viewport.Model
-	width     int
-	height    int
-	err       error
+	username   string
+	messages   []hub.Message
+	input      textinput.Model
+	viewport   viewport.Model
+	width      int
+	height     int
+	err        error
 	serverAddr string
-	conn      *websocket.Conn
+	conn       *websocket.Conn
 }
 
+/*
+NewApp
+Initializes a new App with the given username and server address.
+*/
 func NewApp(username string, serverAddr string) App {
 	ti := textinput.New()
 	ti.Placeholder = "Message..."
@@ -30,13 +46,18 @@ func NewApp(username string, serverAddr string) App {
 	ti.CharLimit = 0
 
 	return App{
-		username:  username,
+		username:   username,
 		serverAddr: serverAddr,
-		input:     ti,
-		viewport:  viewport.New(0, 0),
+		input:      ti,
+		viewport:   viewport.New(0, 0),
 	}
 }
 
+/*
+Init
+Kicks off the WebSocket connection, fetches message history,
+and starts the cursor blink on startup.
+*/
 func (a App) Init() tea.Cmd {
 	return tea.Batch(
 		connect(a.serverAddr, a.username),
@@ -45,6 +66,11 @@ func (a App) Init() tea.Cmd {
 	)
 }
 
+/*
+Update
+Handles all incoming messages -- WebSocket events, keypresses, window
+resizes -- and returns the updated model and any follow-up commands.
+*/
 func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	a.input, cmd = a.input.Update(msg)
@@ -74,6 +100,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.viewport.Height = m.Height - 3
 		a.input.Width = m.Width - 4
 
+	// build message history given new msg received
 	case msgReceived:
 		a.messages = append(a.messages, hub.Message(m))
 		a.viewport.SetContent(a.buildHistory())
