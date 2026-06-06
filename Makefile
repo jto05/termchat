@@ -7,17 +7,17 @@ build: build-server build-client
 
 build-server:
 	@mkdir -p $(BIN)
-	go build -o $(BIN)/server ./cmd/server
+	go build -o $(BIN)/tcs ./cmd/server
 
 build-client:
 	@mkdir -p $(BIN)
-	go build -o $(BIN)/client ./cmd/client
+	go build -o $(BIN)/tcc ./cmd/client
 
 run-server: build-server
-	$(BIN)/server
+	$(BIN)/tcs
 
 run-client: build-client
-	$(BIN)/client $(USERNAME) $(URL)
+	$(BIN)/tcc $(USERNAME) $(URL)
 
 dev:
 	tmux kill-session -t $(SESSION) 2>/dev/null; \
@@ -41,8 +41,8 @@ help:
 	@echo "  make build               build server and client binaries"
 	@echo "  make build-server        build server binary"
 	@echo "  make build-client        build client binary"
-	@echo "  make run-server          build and run the server"
-	@echo "  make run-client USERNAME=<name>  build and run a client"
+	@echo "  make run-server          build and run tcs (server)"
+	@echo "  make run-client USERNAME=<name> URL=<host:port>  build and run tcc (client)"
 	@echo "  make dev                 start server and two clients in tmux"
 	@echo "  make stop-dev            kill the dev tmux session"
 	@echo "  make clean               remove built binaries"
