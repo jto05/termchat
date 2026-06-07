@@ -14,7 +14,7 @@ make build
 
 ## Usage
 
-You can host a termchat server on your machine on port 8080 by running the following binary:
+You can host a termchat server on your machine on port 8080 by running the following:
 ```bash
 ./cmd/tcs
 ```
@@ -27,6 +27,35 @@ the the address of your server in host:port format:
 
 
 ## Architecture
+
+**Hub-and-spoke pub-sub**
+
+Termchat uses a central Hub that all clients connect to. This Hub routes all
+messages/events the clients publish to it through the correct channels,
+ensuring each client only ever communicates with the Hub and not directly
+with each other. 
+
+**WebSocket for real-time messaging**
+
+Instead of sending messages as a series of HTTP requests/responses, WebSockets
+can be used to give both the client and server a persistent connection so the
+server can push messages to clients the moment they arrive. When a client
+registers to a server, they open one WebSocket connection which stays open for
+the session.
+
+**Username via query parameter**
+
+Rather than including a username in every message payload, the client passes it
+once as a query parameter when connecting (`/ws?username=jto`). The server
+reads it and stamps it onto every message it receives from that connection,
+preventing clients from spoofing each other's identity.
+
+**Per-client goroutines**
+
+Each connected client gets two goroutines -- one that reads incoming messages
+from the WebSocket and broadcasts them, and one that reads from the client's
+channel and writes outbound messages back to the WebSocket. This keeps reads
+and writes independent so a slow client can't block the server.
 
 ## Concurrency Model
 
