@@ -40,19 +40,19 @@ the the address of your server in host:port format:
 │   └── creates Hub, registers routes, listens :8080  │
 │                                                     │
 │   internal/hub/hub.go                               │
-│   ├── clients: map[chan Message]bool                 │
+│   ├── clients: map[chan Message]bool                │
 │   ├── register chan   ──┐                           │
-│   ├── unregister chan ──┤── Run() select loop        │
+│   ├── unregister chan ──┤── Run() select loop       │
 │   └── broadcast chan  ──┘                           │
 │                                                     │
 │   internal/hub/routes.go                            │
-│   ├── GET /history  -- serves stored messages        │
+│   ├── GET /history  -- serves stored messages       │
 │   └── /ws           -- upgrades to WebSocket        │
-│       ├── reads username from query param            │
-│       ├── registers client with Hub                  │
-│       ├── pushes history to client on connect        │
-│       ├── write goroutine: chan -- WebSocket (out)   │
-│       └── read loop: WebSocket -- hub.Broadcast      │
+│       ├── reads username from query param           │
+│       ├── registers client with Hub                 │
+│       ├── pushes history to client on connect       │
+│       ├── write goroutine: chan -- WebSocket (out)  │
+│       └── read loop: WebSocket -- hub.Broadcast     │
 └───────────────┬─────────────────────────────────────┘
                 │ WebSocket (ws://host:port/ws?username=)
                 │ HTTP      (http://host:port/history)
